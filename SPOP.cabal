@@ -11,7 +11,7 @@ executable SPOP
     main-is: Main.hs
     buildable: True
     hs-source-dirs: src
-    other-modules: Interface
+    other-modules: Etc Interface
  
 test-suite test-SPOP
     build-depends: QuickCheck -any, base -any
