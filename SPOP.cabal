@@ -7,14 +7,14 @@ license-file: ""
 data-dir: ""
  
 executable SPOP
-    build-depends: QuickCheck -any, base -any
+    build-depends: MissingH -any, QuickCheck -any, base -any
     main-is: Main.hs
     buildable: True
     hs-source-dirs: src
-    other-modules: Etc Interface
+    other-modules: Task Menus Interface Etc Interface
  
 test-suite test-SPOP
-    build-depends: QuickCheck -any, base -any
+    build-depends: MissingH -any, QuickCheck -any, base -any
     type: exitcode-stdio-1.0
     main-is: Main.hs
     buildable: True

@@ -18,34 +18,11 @@ module Main (
 ) where
 
 
-import Interface
-import Etc
+import Menus
+import Task
 
 main = do
-      showMessageBox welcomeInfo
-      mainLoop emptyAddressBook
+        x <- mainMenu newTaskList
+        print x
 
---Główna pętla
-mainLoop addressBook = do
-        printNewLine
-        function <- showMainMenu
-        addressBook <- function addressBook
-        mainLoop addressBook
-
-showMainMenu = do
-         showMenuBox [("Zarządzanie kontaktami", showSubmenuContactsLoop),
-            ("Zarządzanie grupami", showSubmenuGroupsLoop),
-            ("Wyszukiwanie kontaktów",showSearchSubmenuLoop),
-            ("Wyświetlenie osób obchodzących dzisiaj urodziny",showPersonsBirthdayAction),
-            ("Pokaż wszystkie dane",  showAddressBookAction),
-            ("Zapis danych do pliku",  saveData),
-            ("Odczyt danych z pliku", loadData),
-            ("Wyczyszczenie danych", createEmptyAddressBook),
-            ("Zakończ", exit)]
-
-
-#ifndef MAIN_FUNCTION
-#define MAIN_FUNCTION exeMain
-#endif
-main = MAIN_FUNCTION
-
+        
