@@ -27,3 +27,4 @@ readMaybe s =
 
 readMaybeInt :: String -> Maybe Int
 readMaybeInt = readMaybe
+

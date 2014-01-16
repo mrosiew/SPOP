@@ -13,11 +13,27 @@
 -----------------------------------------------------------------------------
 
 module Task (
-newTaskList
+newWorld
 ) where
 
+import Data.Time
+import Data.Maybe
+import Data.Char
+import Numeric
 
 
-newTaskList = 1
+newWorld = World [] "Poniedzialek"
 
---tu bedzie definicja taskow
+data World = World {
+    tasks::[Task],
+    currentDay::String --do implementacji jako dzien
+    }
+
+data Task = Task {
+    id::Int,
+    when::String, --do implementacji jako dzien
+    repeatable::Int, --powinien byc jakis smieszny enum
+    name::String,
+    description::String
+} deriving (Show, Read, Eq)
+
