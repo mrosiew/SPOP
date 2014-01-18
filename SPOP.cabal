@@ -7,14 +7,16 @@ license-file: ""
 data-dir: ""
  
 executable SPOP
-    build-depends: MissingH -any, QuickCheck -any, base -any
+    build-depends: MissingH -any, QuickCheck -any, base -any,
+                   regex-posix -any, time -any
     main-is: Main.hs
     buildable: True
     hs-source-dirs: src
     other-modules: Logic Task Menus Interface Etc Interface
  
 test-suite test-SPOP
-    build-depends: MissingH -any, time -any, QuickCheck -any, base -any
+    build-depends: MissingH -any, QuickCheck -any, base -any,
+                   regex-posix -any, time -any
     type: exitcode-stdio-1.0
     main-is: Main.hs
     buildable: True

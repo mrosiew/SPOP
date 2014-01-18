@@ -16,6 +16,7 @@ module Menus (mainMenu) where
 
 import Interface
 import System.Exit
+import Logic
 
 mainMenu world = do
         menu [("Print unfinished tasks", majtki),
@@ -30,7 +31,7 @@ mainMenu world = do
         --System.Exit, ale jak tak jest to chyba tez dobrze )
 
 manageTaskMenu world = do
-        menu [("Add task", majtki),
+        menu [("Add task", addTask),
                         ("Modify task",majtki),
                         ("Remove task",majtki),
                          ("Go back to menu",majtki)] world
@@ -43,4 +44,3 @@ majtki world = do
 
 
 exit _ = exitWith ExitSuccess
-

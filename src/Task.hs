@@ -12,10 +12,7 @@
 --
 -----------------------------------------------------------------------------
 
-module Task (
-newWorld,
-printTask
-) where
+module Task where
 
 import Data.Time
 import Data.Maybe
