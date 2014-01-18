@@ -5,14 +5,14 @@ build-type: Simple
 license: AllRightsReserved
 license-file: ""
 data-dir: ""
-
+ 
 executable SPOP
     build-depends: MissingH -any, QuickCheck -any, base -any
     main-is: Main.hs
     buildable: True
     hs-source-dirs: src
-    other-modules: Task Menus Interface Etc Interface
-
+    other-modules: Logic Task Menus Interface Etc Interface
+ 
 test-suite test-SPOP
     build-depends: MissingH -any, time -any, QuickCheck -any, base -any
     type: exitcode-stdio-1.0
