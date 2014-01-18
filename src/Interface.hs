@@ -18,14 +18,18 @@ import Etc
 import Data.String.Utils
 
 import Numeric
+import Task
 
-menu list world = do
+menu::[(String, (World->IO World))] -> IO (World->IO World)
+menu list = do
     printMenu textList
-    pickTask taskList world
+    sth <- pickTask taskList
+    return sth
     where
         textList = map fst list
         taskList = map snd list
 
+printMenu::[[Char]]->IO()
 printMenu items = do
         printMenuHelper items 1
 printMenuHelper:: [[Char]] -> Integer -> IO()
@@ -35,19 +39,20 @@ printMenuHelper (firstItem:menuItems) i = do
 printMenuHelper [] i = do
        return()
 
-pickTask items world = do
+pickTask::[World->IO World]-> IO ( World -> IO World )
+pickTask items = do
         putStrLn "What do you want to do now?"
         taskNumber <- getInt 0
 
         let actualTaskNumber = taskNumber - 1
         let listLength = length items
         if actualTaskNumber >= 0 && actualTaskNumber < listLength
-            then (items !! actualTaskNumber) world
-            else
-                putStrLn "Wrong task number"
-                --pickTask items world
-                --return()
+            then return (items !! actualTaskNumber)
+            else  return wrongNumber
 
+wrongNumber world = do
+    putStrLn "Wrong task number"
+    return world
 
 getInt defaultValue = do
     maybeInt <- getMaybeInt

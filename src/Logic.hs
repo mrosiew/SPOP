@@ -34,31 +34,30 @@ addTask (World tasks day) = do
           else
               putStr ""
 
-    if  ( isNothing maybeRepeatable )
-          then do
-              showError "jakis string 6"
-          else
-              putStr ""
+ --   if  ( isNothing maybeRepeatable )
+  --        then do
+ --             showError "jakis string 6"
+ --         else
+ --             putStr ""
 
 
     if isNothing maybeWhen ||
-       isNothing maybeRepeatable ||
        isNothing maybeName ||
        isNothing maybeDescription
         then do
-           putStrLn "jakis string 7"
+           putStrLn "Puste cus"
            return (World tasks day)
         else do
-            let newTask = doAddTask   ( getNextTaskId tasks)
-                                      ( fromJust maybeWhen)
-                                      ( fromJust maybeRepeatable)
+            let newTaskList = doAddTask   ( getNextTaskId tasks)
+                                      ( show (fromJust maybeWhen))
+                                       maybeRepeatable
                                       ( fromJust maybeName)
                                       ( fromJust maybeDescription)
                                       False
                                       tasks
 
-            putStrLn "jakis string 8" -- sukces!!
-            return (World newTask day)
+            putStrLn "Udalo sie dodac" -- sukces!!
+            return (World newTaskList day)
 
 
 --doAddPerson  id firstName lastName companyName phone email birthDay persons = do

@@ -22,7 +22,7 @@ import Menus
 import Task
 
 main = do
-        x <- mainMenu newWorld
-        print x
+        mainMenu newWorld
+        --print x
 
         

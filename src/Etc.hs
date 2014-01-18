@@ -82,11 +82,12 @@ errStr msg = "Error: " ++ msg
 showError msg = putStrLn (errStr msg)
 
 
+getDupa dupa = 0
 getRepeValidation str | str == "no" = 0
                       | str == "daily" = 1
                       | str == "weekly" = 2
                       | str == "monthly" = 3
-                      | otherwise = -1
+                      | otherwise = 5
 
 
 --let maybeWhen = checkWhen (fromJust maybeWhenfiled)
