@@ -21,7 +21,7 @@ import Task
 
 mainMenu::World -> IO World
 mainMenu world = do
-        pickedTask <- menu [("Print unfinished tasks", majtki),
+        pickedTask <- menu [("Print unfinished tasks", viewAllTasks),
                         ("Print tasks to do today",majtki),
                         ("Print task for particular day",majtki),
                          ("Manage tasks",manageTaskMenu),

@@ -19,6 +19,7 @@ import Task
 import Etc
 import Task
 
+addTask::World -> IO World
 addTask (World tasks day) = do
     maybeWhenfield <- getName when "jakis string"
     maybeRepeatablefield <- getName repeatable "jakis string 2"
@@ -59,10 +60,6 @@ addTask (World tasks day) = do
             putStrLn "Udalo sie dodac" -- sukces!!
             return (World newTaskList day)
 
-
---doAddPerson  id firstName lastName companyName phone email birthDay persons = do
---        [(Person id firstName lastName companyName phone email birthDay [])] ++ persons
-
 doAddTask id when repeatable name description isDone tasks = do
         [(Task id when repeatable name description isDone)] ++ tasks -- [] ??
         
@@ -70,4 +67,15 @@ getNextTaskId:: [Task] -> Int
 getNextTaskId [] = 1;
 getNextTaskId (x:xs) = (max (getTaskId x) (getNextTaskId xs))+1 ;
 
---newTask = tasks ++ newTask
+viewAllTasks::World-> IO World
+viewAllTasks (World tasks day) = do
+    printTaskList tasks
+    return (World tasks day)
+
+printTaskList (firstTaskInList:restOfTasks) = do
+    printTask firstTaskInList
+    printTaskList restOfTasks
+    return ()
+printTaskList [] = do
+    return()
+
