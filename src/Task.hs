@@ -18,18 +18,31 @@ import Data.Time
 import Data.Maybe
 import Data.Char
 import Numeric
+import Data.Time.Calendar
+import System.IO.Unsafe --35th line
+--import Time
+--import System.Locale (defaultTimeLocale)
 
+blebleble::IO Day
+blebleble = do
+        currentTime <- getCurrentTime
+        let currentUtcDay = utctDay currentTime in
+                let (y,m,d) = toGregorian currentUtcDay in
+                        let gregorianDay = fromGregorian y m d in
+                                return gregorianDay
+       
+newWorld::World
+newWorld = (World [] (unsafePerformIO blebleble)) --yolo
 
-newWorld = World [] "Poniedzialek"
 
 data World = World {
     tasks::[Task],
-    currentDay::String --do implementacji jako dzien
+    currentDay::Day --do implementacji jako dzien
     }
 
 data Task = Task {
     id::Int,
-    when::String, --do implementacji jako dzien
+    when::Day, --do implementacji jako dzien
     repeatable::Int, --powinien byc jakis smieszny enum
     name::String,
     description::String,
@@ -38,7 +51,7 @@ data Task = Task {
 
 printTask (Task id when repeatable name description isDone) = do
             putStrLn ("id: " ++ (show id))
-            putStrLn ("Due date: " ++ when)
+            putStrLn ("Due date: " ++ (show when))
             putStrLn ("Repeatable " ++ (show repeatable))
             putStrLn ("Name " ++ name)
             putStrLn ("Description: " ++ description)

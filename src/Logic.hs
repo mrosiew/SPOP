@@ -32,11 +32,22 @@ addTask (World tasks day) = do
 
     if  ( isNothing maybeWhen )
           then do
-              showError "Wrong date format! Please use yyyy-mm-dd instead"
+              putStrLn "Wrong date format! Please use yyyy-mm-dd instead"
               putStrLn ("\n")
           else
               putStr ""
 
+    if isNothing maybeName
+            then do putStrLn "maybeName"
+            else do putStrLn ""
+
+    if maybeRepeatable == 5
+            then do putStrLn "maybeRepeatable"
+            else do putStrLn ""
+
+    if isNothing maybeDescription
+            then do putStrLn "maybeDescription"
+            else do putStrLn ""
 
     if isNothing maybeWhen ||
        isNothing maybeName ||
@@ -48,7 +59,7 @@ addTask (World tasks day) = do
            return (World tasks day)
         else do
             let newTaskList = doAddTask   ( getNextTaskId tasks)
-                                      ( show (fromJust maybeWhen))
+                                      (fromJust maybeWhen)
                                        maybeRepeatable
                                       ( fromJust maybeName)
                                       ( fromJust maybeDescription)
@@ -74,12 +85,32 @@ viewAllTasks (World tasks day) = do
     printTaskList tasks
     return (World tasks day)
 
+viewTasksToDoToday::World-> IO World
+viewTasksToDoToday (World tasks day) = do
+    printTaskList (filterTasksOnDate tasks day day)
+    return (World tasks day)
+
+viewUnfinishedTasks::World-> IO World
+viewUnfinishedTasks (World tasks day) = do
+    printTaskList (filterFinishedTasks tasks False)
+    return (World tasks day)
+
+
 printTaskList (firstTaskInList:restOfTasks) = do
     printTask firstTaskInList
     printTaskList restOfTasks
     return ()
 printTaskList [] = do
     return()
+
+--filterTasksOnDate::[Task]->Day->Day->[Task]
+filterTasksOnDate (firstTaskInList:restOfTasks) after before =
+        let dayOfTheTask = getTaskWhen firstTaskInList in
+                if dayOfTheTask > after ||
+                dayOfTheTask < before
+                        then filterTasksOnDate restOfTasks after before
+                        else firstTaskInList : (filterTasksOnDate restOfTasks after before)
+filterTasksOnDate [] _ _ = []
 
 filterFinishedTasks::[Task] -> Bool-> [Task] --not used anywhere so far
 filterFinishedTasks (firstTaskInList:restOfTasks) isDone =
