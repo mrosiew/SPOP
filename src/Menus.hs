@@ -43,11 +43,12 @@ manageTaskMenu::World -> IO World
 manageTaskMenu world = do
         pickedTask <- menu [("Add task", addTask),
                             ("Mark task as done", markAsDone),
-                            ("Modify task",empty), ---------------
+                            ("Modify task",modifyTask),
                             ("Remove task",removeTask),
                             ("Go back to menu",empty)]
         kek <- pickedTask world
         return kek
+
 
 --filler
 empty::World -> IO World

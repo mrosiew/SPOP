@@ -92,8 +92,13 @@ viewAllTasks (World tasks day) = do
 
 viewTasksToDoToday::World-> IO World
 viewTasksToDoToday (World tasks day) = do
-    printTaskList (filterTasksOnDate tasks day day)
-    return (World tasks day)
+    let taskList = filterTasksOnDate tasks day day
+    if taskList == [] then do putStrLn ("\n")
+                              putStrLn "No tasks to display"
+                              putStrLn ("\n")
+                              return (World tasks day)
+                      else do printTaskList taskList
+                              return (World tasks day)
 
 
 viewTasksToDoOnX::World-> IO World
@@ -108,8 +113,13 @@ viewTasksToDoOnX (World tasks day) = do
               putStrLn ("\n")
               return (World tasks day)
           else do
-              printTaskList (filterTasksOnDate tasks (fromJust maybeDay) (fromJust maybeDay))
-              return (World tasks day)
+              let taskList = filterTasksOnDate tasks (fromJust maybeDay) (fromJust maybeDay)
+              if taskList == [] then do putStrLn ("\n")
+                                        putStrLn "No tasks to display"
+                                        putStrLn ("\n")
+                                        return (World tasks day)
+                                else do printTaskList taskList
+                                        return (World tasks day)
 
 
 viewUnfinishedTasks::World-> IO World
@@ -121,12 +131,11 @@ viewUnfinishedTasks (World tasks day) = do
 printTaskList (firstTaskInList:restOfTasks) = do
     printTask firstTaskInList
     printTaskList restOfTasks
-    return ()
+    return 1
 printTaskList [] = do
-    return()
+    return 0
 
 
---filterTasksOnDate::[Task]->Day->Day->[Task]
 filterTasksOnDate (firstTaskInList:restOfTasks) after before =
         let dayOfTheTask = getTaskWhen firstTaskInList in
                 if dayOfTheTask > after ||
@@ -136,7 +145,7 @@ filterTasksOnDate (firstTaskInList:restOfTasks) after before =
 filterTasksOnDate [] _ _ = []
 
 
-filterFinishedTasks::[Task] -> Bool-> [Task] --not used anywhere so far
+filterFinishedTasks::[Task] -> Bool-> [Task]
 filterFinishedTasks (firstTaskInList:restOfTasks) isDone =
     if getTaskIsDone firstTaskInList == isDone
         then firstTaskInList : (filterFinishedTasks restOfTasks isDone)
@@ -212,4 +221,95 @@ changeDate (World tasks day) = do
 
 todaysDate (World tasks day) = day
 
+
+modifyTask (World tasks day) = do
+    putStrLn "Which task do you want to modify?"
+    idMod <- getInt 0
+    if (idMod == 0)
+        then do
+            putStrLn "Error: Task id should be a number"
+            return (World tasks day)
+        else do
+            let maybeTask = getTaskById idMod tasks
+            if ( isNothing maybeTask )
+                then do
+                    putStrLn "Error: Task not found"
+                    return (World tasks day)
+                else do
+                    let task = fromJust maybeTask
+                    let index = fromJust (elemIndex task tasks)
+                    let doneTask = modifyTaskMenu task
+                    let changedTasks = replaceTask index doneTask tasks
+                    putStrLn "Task status changed successfully!"
+                    putStrLn ("\n")
+                    return (World changedTasks day)
+
+modifyTaskMenu task = do
+        pickedTask <- menu [("Modify task's due date", modDate),
+                            ("Modify how often the task will be repeated", emp), --modRepe),
+                            ("Modify task's name",emp), --modName),
+                            ("Modify task's description", emp), --modDesc),
+                            ("Go back to menu",emp)]
+        kek <- pickedTask world
+        return kek
+
+emp::Task -> IO Task
+emp task = do
+            return task
+
+{-|
+
+modDate (World tasks day) = do
+    maybeWhenfield <- getName when "When is this task due? (yyyy-mm-dd)"
+    let maybeWhen = getDateWithValidation (fromJust maybeWhenfield)
+    if  ( isNothing maybeWhen )
+          then do
+              putStrLn "Wrong date format! Please use yyyy-mm-dd instead"
+              putStrLn ("\n")
+          else
+              putStr ""
+    if isNothing maybeWhen then do
+       return (World tasks day)
+       else do
+            let maybeTask = getTaskById idToDone tasks
+            if ( isNothing maybeTask )
+                then do
+                    putStrLn "Error: Task not found"
+                    return (World tasks day)
+                else do
+                    let task = (fromJust maybeTask)
+                    let index = fromJust (elemIndex task tasks)
+                    let changedTask =  (Task (getTaskId task)
+                                    (fromJust maybeWhen)
+                                    (getTaskRepeatable task)
+                                    (getTaskName task)
+                                    (getTaskDescription task)
+                                    (getTaskIsDone task)
+                    let changedTasks = replaceTask index changedTask tasks
+                    putStrLn "Task changed successfully!"
+                    putStrLn ("\n")
+                    return (World changedTasks day)
+
+-}
+{-
+
+modRepe (World tasks day) = do
+    maybeRepeatablefield <- getName repeatable "Is this task repeatable? ('no, 'daily, 'weekly' or 'monthly')"
+    let maybeRepeatable = getRepeValidation (fromJust maybeRepeatablefield)
+    if  ( maybeWhen == 5 )
+          then do putStrLn "Wrong Repeatable value"
+                  return (World tasks day)
+
+modName (World tasks day) = do
+    maybeName <- getName name "Name of the task"
+    if  ( isNothing maybeName )
+          then do putStrLn "Wrong Name value"
+
+
+modDesc (World tasks day) = do
+    maybeDescription <- getName description "Describe task"
+    if  ( isNothing maybeDescription )
+          then do putStrLn "Wrong Description value"
+
+-}
 
