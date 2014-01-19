@@ -20,7 +20,7 @@ import Data.String.Utils
 import Numeric
 import Task
 
-menu::[(String, (a->IO a))] -> IO (a->IO a)
+--menu::[(String, (a->IO a))] -> IO (a->IO a)
 menu list = do
     printMenu textList
     sth <- pickTask taskList
@@ -39,7 +39,7 @@ printMenuHelper (firstItem:menuItems) i = do
 printMenuHelper [] i = do
        return()
 
-pickTask::[a->IO a]-> IO ( a -> IO a )
+--pickTask::[a->IO a]-> IO ( a -> IO c )
 pickTask items = do
         putStrLn "What do you want to do now?"
         taskNumber <- getInt 0

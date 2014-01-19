@@ -21,6 +21,7 @@ import Task
 import Etc
 import Task
 import Interface
+import Data.Time.Calendar
 
 addTask::World -> IO World
 addTask (World tasks day) = do
@@ -75,6 +76,7 @@ addTask (World tasks day) = do
             
             return (World newTaskList day)
 
+doAddTask::Int->Day->Int->String->String->Bool->[Task]->[Task]
 doAddTask id when repeatable name description isDone tasks = do
         [(Task id when repeatable name description isDone)] ++ tasks -- [] ??
 
@@ -221,7 +223,7 @@ changeDate (World tasks day) = do
 
 todaysDate (World tasks day) = day
 
-
+modifyTask::World->IO World
 modifyTask (World tasks day) = do
     putStrLn "Which task do you want to modify?"
     idMod <- getInt 0
@@ -238,59 +240,53 @@ modifyTask (World tasks day) = do
                 else do
                     let task = fromJust maybeTask
                     let index = fromJust (elemIndex task tasks)
-                    let doneTask = modifyTaskMenu task
-                    let changedTasks = replaceTask index doneTask tasks
+                    let newTaskList = modifyTaskMenu task tasks
+                    --let changedTasks = replaceTask index doneTask tasks
                     putStrLn "Task status changed successfully!"
                     putStrLn ("\n")
-                    return (World changedTasks day)
+                    --patrzcie kurwy na ta magie
+                    --wyjmuje sobie
+                    newTaskList >>= (\ x -> liftWorld (return (snd x)) (return day))
+                    --liftWorld asd (return day)
 
-modifyTaskMenu task = do
+--liftWorld :: Monad m => (a -> b -> c) -> m a -> m b -> m c
+--liftWorld::IO m => IO [Task] -> IO Day -> IO World
+liftWorld  changedTasks day = do
+        x <- changedTasks
+        y <- day
+        return (World x y)
+
+--modifyTaskMenu::Task->[Task]->IO [Task]
+modifyTaskMenu task taskList = do
         pickedTask <- menu [("Modify task's due date", modDate),
                             ("Modify how often the task will be repeated", emp), --modRepe),
                             ("Modify task's name",emp), --modName),
                             ("Modify task's description", emp), --modDesc),
                             ("Go back to menu",emp)]
-        kek <- pickedTask world
+        kek <- pickedTask (task, taskList) --
         return kek
 
-emp::Task -> IO Task
-emp task = do
-            return task
 
-{-|
+emp (task, taskList)= do
+        return (task, taskList)
 
-modDate (World tasks day) = do
+--modDate::Task->[Task]->IO [Task]
+modDate ((Task id when repeatable name description isDone), tasks)= do
     maybeWhenfield <- getName when "When is this task due? (yyyy-mm-dd)"
     let maybeWhen = getDateWithValidation (fromJust maybeWhenfield)
-    if  ( isNothing maybeWhen )
+    if isNothing maybeWhen 
           then do
-              putStrLn "Wrong date format! Please use yyyy-mm-dd instead"
-              putStrLn ("\n")
-          else
-              putStr ""
-    if isNothing maybeWhen then do
-       return (World tasks day)
-       else do
-            let maybeTask = getTaskById idToDone tasks
-            if ( isNothing maybeTask )
-                then do
-                    putStrLn "Error: Task not found"
-                    return (World tasks day)
-                else do
-                    let task = (fromJust maybeTask)
-                    let index = fromJust (elemIndex task tasks)
-                    let changedTask =  (Task (getTaskId task)
-                                    (fromJust maybeWhen)
-                                    (getTaskRepeatable task)
-                                    (getTaskName task)
-                                    (getTaskDescription task)
-                                    (getTaskIsDone task)
-                    let changedTasks = replaceTask index changedTask tasks
-                    putStrLn "Task changed successfully!"
-                    putStrLn ("\n")
-                    return (World changedTasks day)
+                putStrLn "Wrong date format! Please use yyyy-mm-dd instead"
+                putStrLn ("\n")
+                return ((Task id when repeatable name description isDone), tasks)
+          else do
+                putStrLn "Task changed successfully!"
+                putStrLn ("\n")
+                let index = fromJust (elemIndex (Task id when repeatable name description isDone) tasks) in
+                        let newTask = (Task id (fromJust maybeWhen) repeatable name description isDone) in
+                                return ((Task id when repeatable name description isDone), (replaceTask index newTask tasks))
 
--}
+
 {-
 
 modRepe (World tasks day) = do

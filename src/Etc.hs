@@ -118,8 +118,9 @@ removeItem _ [] = []
 removeItem t (x:xs) | t == x    = xs
                     | otherwise = x : removeItem t xs
 
-
+replaceTask::Int->Task->[Task]->[Task]
 replaceTask index newTask (x:xs)  | index == 0   = newTask : xs
                                   | otherwise    = x : replaceTask (index - 1) newTask xs
      
 --let maybeWhen = checkWhen (fromJust maybeWhenfiled)
+
