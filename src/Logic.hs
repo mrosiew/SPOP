@@ -21,10 +21,10 @@ import Task
 
 addTask::World -> IO World
 addTask (World tasks day) = do
-    maybeWhenfield <- getName when "jakis string"
-    maybeRepeatablefield <- getName repeatable "jakis string 2"
-    maybeName <- getName name "jakis string 3"
-    maybeDescription <- getName description "jakis string 4"
+    maybeWhenfield <- getName when "When is this task due?:"
+    maybeRepeatablefield <- getName repeatable "Is this task repeatable?"
+    maybeName <- getName name "Name of the task"
+    maybeDescription <- getName description "Describe task"
 
     let maybeWhen = getDateWithValidation (fromJust maybeWhenfield)
     let maybeRepeatable = getRepeValidation (fromJust maybeRepeatablefield)
@@ -78,4 +78,11 @@ printTaskList (firstTaskInList:restOfTasks) = do
     return ()
 printTaskList [] = do
     return()
+
+filterFinishedTasks::[Task] -> Bool-> [Task] --not used anywhere so far
+filterFinishedTasks (firstTaskInList:restOfTasks) isDone =
+    if getTaskIsDone firstTaskInList == isDone
+        then firstTaskInList : (filterFinishedTasks restOfTasks isDone)
+        else filterFinishedTasks restOfTasks isDone
+filterFinishedTasks [] _ = []
 
