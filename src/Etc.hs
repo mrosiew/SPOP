@@ -26,6 +26,15 @@ printSeparator = print "---"
 printList list = mapM_ putStrLn list
 
 
+printTask (Task id when repeatable name description isDone) = do
+            putStrLn ("id: " ++ (show id))
+            putStrLn ("Due date: " ++ (show when))
+            putStrLn ("Repeatable: " ++ (getRepe repeatable))
+            putStrLn ("Name " ++ name)
+            putStrLn ("Description: " ++ description)
+            putStrLn ("It's done? " ++ (show isDone) )
+            putStrLn ("\n")
+
 readMaybe :: (Read a) => String -> Maybe a
 readMaybe s =
         case reads s of
@@ -88,13 +97,12 @@ getRepeValidation str | str == "no" = 0
                       | str == "weekly" = 2
                       | str == "monthly" = 3
                       | otherwise = 5
-                      
-------------- not used
-makeInt:: String -> Int
-makeInt str = parseWithDef (readDec str) 0
-parseWithDef [] def = def
-parseWithDef [(id, _)] def = id
-------------- not used
+
+getRepe int | int == 0  = "no"
+            | int == 1  = "daily"
+            | int == 2  = "weekly"
+            | int == 3  = "monthly"
+
 
 getTaskById:: Int -> [Task] -> Maybe Task
 getTaskById id [] = Nothing
@@ -104,9 +112,14 @@ getTaskById id (x:xs) = if (id == getTaskId x )
                             else
                                 getTaskById id xs
 
+
 removeItem :: (Eq t) => t -> [t] -> [t]
 removeItem _ [] = []
 removeItem t (x:xs) | t == x    = xs
                     | otherwise = x : removeItem t xs
 
+
+replaceTask index newTask (x:xs)  | index == 0   = newTask : xs
+                                  | otherwise    = x : replaceTask (index - 1) newTask xs
+     
 --let maybeWhen = checkWhen (fromJust maybeWhenfiled)

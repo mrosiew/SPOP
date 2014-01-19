@@ -14,6 +14,8 @@
 
 module Logic where
 
+--import System.Console.ANSI
+import Data.List
 import Data.Maybe
 import Task
 import Etc
@@ -22,8 +24,8 @@ import Interface
 
 addTask::World -> IO World
 addTask (World tasks day) = do
-    maybeWhenfield <- getName when "When is this task due?"
-    maybeRepeatablefield <- getName repeatable "Is this task repeatable?"
+    maybeWhenfield <- getName when "When is this task due? (yyyy-mm-dd)"
+    maybeRepeatablefield <- getName repeatable "Is this task repeatable? ('no, 'daily, 'weekly' or 'monthly')"
     maybeName <- getName name "Name of the task"
     maybeDescription <- getName description "Describe task"
 
@@ -38,15 +40,15 @@ addTask (World tasks day) = do
               putStr ""
 
     if isNothing maybeName
-            then do putStrLn "maybeName"
+            then do putStrLn "Wrong Name value"
             else do putStrLn ""
 
     if maybeRepeatable == 5
-            then do putStrLn "maybeRepeatable"
+            then do putStrLn "Wrong Repeatable value"
             else do putStrLn ""
 
     if isNothing maybeDescription
-            then do putStrLn "maybeDescription"
+            then do putStrLn "Wrong Description value"
             else do putStrLn ""
 
     if isNothing maybeWhen ||
@@ -123,14 +125,12 @@ removeTask::World-> IO World
 removeTask (World tasks day) = do
     putStrLn "Which task do you want to delete?"
     idToDelete <- getInt 0
-    --idToDelete  <- getName when "Which task do you want to delete?"  ------- when...
     if (idToDelete == 0)
         then do
             putStrLn "Error: Task id should be a number"
             return (World tasks day)
         else do
-            let maybeTask = getTaskById idToDelete tasks --
-
+            let maybeTask = getTaskById idToDelete tasks
             if ( isNothing maybeTask )
                 then do
                     putStrLn "Error: Task not found"
@@ -140,4 +140,30 @@ removeTask (World tasks day) = do
                     putStrLn "Task deleted successfully!"
                     return (World lessTasks day)
 
-
+markAsDone::World-> IO World
+markAsDone (World tasks day) = do
+    putStrLn "Which task do you want to mark as done?"
+    idToDone <- getInt 0
+    if (idToDone == 0)
+        then do
+            putStrLn "Error: Task id should be a number"
+            return (World tasks day)
+        else do
+            let maybeTask = getTaskById idToDone tasks
+            if ( isNothing maybeTask )
+                then do
+                    putStrLn "Error: Task not found"
+                    return (World tasks day)
+                else do
+                    let task = (fromJust maybeTask)
+                    let index = fromJust (elemIndex task tasks)
+                    let doneTask =  (Task (getTaskId task)
+                                    (getTaskWhen task)
+                                    (getTaskRepeatable task)
+                                    (getTaskName task)
+                                    (getTaskDescription task)
+                                    True)
+                    let changedTasks = replaceTask index doneTask tasks
+                    putStrLn "Task status changed successfully!"
+                    return (World changedTasks day)
+                    

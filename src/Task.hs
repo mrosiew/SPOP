@@ -20,6 +20,7 @@ import Data.Char
 import Numeric
 import Data.Time.Calendar
 import System.IO.Unsafe --35th line
+
 --import Time
 --import System.Locale (defaultTimeLocale)
 
@@ -48,15 +49,6 @@ data Task = Task {
     description::String,
     isDone::Bool
 } deriving (Show, Read, Eq)
-
-printTask (Task id when repeatable name description isDone) = do
-            putStrLn ("id: " ++ (show id))
-            putStrLn ("Due date: " ++ (show when))
-            putStrLn ("Repeatable " ++ (show repeatable))
-            putStrLn ("Name " ++ name)
-            putStrLn ("Description: " ++ description)
-            putStrLn ("It's done? " ++ (show isDone) )
-            putStrLn ("\n")
 
 getTaskId(Task id _ _ _ _ _) = id
 getTaskWhen(Task _ when _ _ _ _) = when
