@@ -24,15 +24,15 @@ import Data.Time.Calendar
 mainMenu::World -> IO World
 mainMenu world = do
       --  temp <- toGregorian day
-                --putStrLn ("Hi! Today is " ++ (show day))
+                putStrLn ("Hi! Today is " ++  (show (todaysDate world )))
                 pickedTask <- menu [("Print all tasks", viewAllTasks),
                                     ("Print unfinished tasks", viewUnfinishedTasks),
                                     ("Print tasks to do today",viewTasksToDoToday),
-                                    ("Print task for particular day",empty), ---------------
+                                    ("Print task for particular day",viewTasksToDoOnX),
                                     ("Manage tasks",manageTaskMenu),
                                     ("Export tasks to file",empty), ---------------
                                     ("Import tasks from file",empty), ---------------
-                                    ("Change a date (debug)", empty), ---------------
+                                    ("Change a date (debug)",changeDate),
                                     ("Exit program", exit)]
                 updatedWorld <- pickedTask world
                 mainMenu updatedWorld
