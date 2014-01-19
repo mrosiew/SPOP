@@ -23,6 +23,5 @@ import Task
 
 main = do
         mainMenu newWorld
-        --print x
 
         

@@ -19,12 +19,13 @@ import Data.String.Utils
 import Numeric
 import Text.Regex.Posix
 import Data.Maybe
+import Task
 
 printNewLine = putStrLn ""
 printSeparator = print "---"
 printList list = mapM_ putStrLn list
 
--- Wczytanie obiekt Maybe z ciagu znakow
+
 readMaybe :: (Read a) => String -> Maybe a
 readMaybe s =
         case reads s of
@@ -82,12 +83,30 @@ errStr msg = "Error: " ++ msg
 showError msg = putStrLn (errStr msg)
 
 
-getDupa dupa = 0
 getRepeValidation str | str == "no" = 0
                       | str == "daily" = 1
                       | str == "weekly" = 2
                       | str == "monthly" = 3
                       | otherwise = 5
+                      
+------------- not used
+makeInt:: String -> Int
+makeInt str = parseWithDef (readDec str) 0
+parseWithDef [] def = def
+parseWithDef [(id, _)] def = id
+------------- not used
 
+getTaskById:: Int -> [Task] -> Maybe Task
+getTaskById id [] = Nothing
+getTaskById id (x:xs) = if (id == getTaskId x )
+                            then
+                                Just x
+                            else
+                                getTaskById id xs
+
+removeItem :: (Eq t) => t -> [t] -> [t]
+removeItem _ [] = []
+removeItem t (x:xs) | t == x    = xs
+                    | otherwise = x : removeItem t xs
 
 --let maybeWhen = checkWhen (fromJust maybeWhenfiled)

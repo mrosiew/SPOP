@@ -39,10 +39,11 @@ data Task = Task {
 printTask (Task id when repeatable name description isDone) = do
             putStrLn ("id: " ++ (show id))
             putStrLn ("Due date: " ++ when)
-            putStrLn ("Repeatable every " ++ (show id) ++ " day")
+            putStrLn ("Repeatable " ++ (show repeatable))
             putStrLn ("Name " ++ name)
             putStrLn ("Description: " ++ description)
             putStrLn ("It's done? " ++ (show isDone) )
+            putStrLn ("\n")
 
 getTaskId(Task id _ _ _ _ _) = id
 getTaskWhen(Task _ when _ _ _ _) = when

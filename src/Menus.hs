@@ -38,7 +38,7 @@ manageTaskMenu::World -> IO World
 manageTaskMenu world = do
         pickedTask <- menu [("Add task", addTask),
                         ("Modify task",majtki),
-                        ("Remove task",majtki),
+                        ("Remove task",removeTask),
                          ("Go back to menu",majtki)]
         kek <- pickedTask world
         return kek
