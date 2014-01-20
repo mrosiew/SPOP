@@ -1,7 +1,7 @@
 -----------------------------------------------------------------------------
 --
 -- Module      :  Logic
--- Copyright   :
+-- Copyright   :  Mateusz Rosiewicz i Pawel Sosnowski
 -- License     :  AllRightsReserved
 --
 -- Maintainer  :
