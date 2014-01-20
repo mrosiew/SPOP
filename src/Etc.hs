@@ -96,12 +96,14 @@ getRepeValidation str | str == "no" = 0
                       | str == "daily" = 1
                       | str == "weekly" = 2
                       | str == "monthly" = 3
+                      | str == "yearly" = 4
                       | otherwise = 5
 
 getRepe int | int == 0  = "no"
             | int == 1  = "daily"
             | int == 2  = "weekly"
             | int == 3  = "monthly"
+            | int == 4  = "yearly"
 
 
 getTaskById:: Int -> [Task] -> Maybe Task

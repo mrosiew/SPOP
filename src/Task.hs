@@ -24,8 +24,8 @@ import System.IO.Unsafe --35th line
 --import Time
 --import System.Locale (defaultTimeLocale)
 
-blebleble::IO Day
-blebleble = do
+getSystemDay::IO Day
+getSystemDay = do
         currentTime <- getCurrentTime
         let currentUtcDay = utctDay currentTime in
                 let (y,m,d) = toGregorian currentUtcDay in
@@ -33,7 +33,7 @@ blebleble = do
                                 return gregorianDay
        
 newWorld::World
-newWorld = (World [] (unsafePerformIO blebleble)) --yolo
+newWorld = (World [] (unsafePerformIO getSystemDay)) --yolo
 
 
 data World = World {

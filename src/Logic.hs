@@ -26,7 +26,7 @@ import Data.Time.Calendar
 addTask::World -> IO World
 addTask (World tasks day) = do
     maybeWhenfield <- getName when "When is this task due? (yyyy-mm-dd)"
-    maybeRepeatablefield <- getName repeatable "Is this task repeatable? ('no, 'daily, 'weekly' or 'monthly')"
+    maybeRepeatablefield <- getName repeatable "Is this task repeatable? ('no, 'daily, 'weekly' or 'monthly', 'yearly')"
     maybeName <- getName name "Name of the task"
     maybeDescription <- getName description "Describe task"
 
@@ -241,11 +241,11 @@ modifyTask (World tasks day) = do
                     let task = fromJust maybeTask
                     let index = fromJust (elemIndex task tasks)
                     let newTaskList = modifyTaskMenu task tasks
-                    --let changedTasks = replaceTask index doneTask tasks
                     putStrLn "Task status changed successfully!"
                     putStrLn ("\n")
-                    --patrzcie kurwy na ta magie
-                    --wyjmuje sobie
+                    --tutaj zamieniam IO (Task,[Task]) na IO [Task] tak jak powinno byc
+                    --dzieje sie to ze z jakiegos powodu funkcje w menu musza zwracac dokladnie to
+                    --samo co przyjmuja co jest dosc slabe ale nie da sie tego tak latwo obejsc
                     newTaskList >>= (\ x -> liftWorld (return (snd x)) (return day))
                     --liftWorld asd (return day)
 
@@ -259,53 +259,82 @@ liftWorld  changedTasks day = do
 --modifyTaskMenu::Task->[Task]->IO [Task]
 modifyTaskMenu task taskList = do
         pickedTask <- menu [("Modify task's due date", modDate),
-                            ("Modify how often the task will be repeated", emp), --modRepe),
-                            ("Modify task's name",emp), --modName),
-                            ("Modify task's description", emp), --modDesc),
+                            ("Modify how often the task will be repeated", modRepe), --modRepe),
+                            ("Modify task's name",modName), --modName),
+                            ("Modify task's description", modDesc), --modDesc),
                             ("Go back to menu",emp)]
         kek <- pickedTask (task, taskList) --
         return kek
 
-
-emp (task, taskList)= do
-        return (task, taskList)
+emp (task, taskList) = do return (task, taskList)
 
 --modDate::Task->[Task]->IO [Task]
-modDate ((Task id when repeatable name description isDone), tasks)= do
+--modyfikacja powtarzania daty
+modDate ((Task id when repeatable name description isDone), tasks) = do
     maybeWhenfield <- getName when "When is this task due? (yyyy-mm-dd)"
     let maybeWhen = getDateWithValidation (fromJust maybeWhenfield)
+    let oldTask = Task id when repeatable name description isDone
     if isNothing maybeWhen 
           then do
                 putStrLn "Wrong date format! Please use yyyy-mm-dd instead"
                 putStrLn ("\n")
-                return ((Task id when repeatable name description isDone), tasks)
+                return (oldTask, tasks)
           else do
                 putStrLn "Task changed successfully!"
                 putStrLn ("\n")
-                let index = fromJust (elemIndex (Task id when repeatable name description isDone) tasks) in
+                let index = fromJust (elemIndex oldTask tasks) in
                         let newTask = (Task id (fromJust maybeWhen) repeatable name description isDone) in
-                                return ((Task id when repeatable name description isDone), (replaceTask index newTask tasks))
-
-
-{-
-
-modRepe (World tasks day) = do
-    maybeRepeatablefield <- getName repeatable "Is this task repeatable? ('no, 'daily, 'weekly' or 'monthly')"
+                                return (oldTask, (replaceTask index newTask tasks))
+--modyfikacja powtarzalnosci
+modRepe ((Task id when repeatable name description isDone), tasks) = do
+    maybeRepeatablefield <- getName repeatable "Is this task repeatable? ('no, 'daily, 'weekly', 'monthly' or 'yearly')"
     let maybeRepeatable = getRepeValidation (fromJust maybeRepeatablefield)
-    if  ( maybeWhen == 5 )
-          then do putStrLn "Wrong Repeatable value"
-                  return (World tasks day)
+    let oldTask = Task id when repeatable name description isDone
+    if  ( maybeRepeatable == 5 )
+          then do
+                putStrLn "Wrong repetition value!"
+                putStrLn ("\n")
+                return (oldTask, tasks)
+          else do
+                putStrLn "Task changed successfully!"
+                putStrLn ("\n")
+                let index = fromJust (elemIndex oldTask tasks) in
+                        let newTask = (Task id when maybeRepeatable name description isDone) in
+                                return (oldTask, (replaceTask index newTask tasks))
 
-modName (World tasks day) = do
+--modyfikacja nazwy
+modName ((Task id when repeatable name description isDone), tasks) = do
     maybeName <- getName name "Name of the task"
+    let oldTask = Task id when repeatable name description isDone
     if  ( isNothing maybeName )
-          then do putStrLn "Wrong Name value"
-
-
-modDesc (World tasks day) = do
+          then do
+                putStrLn "Wrong name value!"
+                putStrLn ("\n")
+                return (oldTask, tasks)
+          else do
+                putStrLn "Task changed successfully!"
+                putStrLn ("\n")
+                let index = fromJust (elemIndex oldTask tasks) in
+                        let newTask = (Task id when repeatable (fromJust maybeName) description isDone) in
+                                return (oldTask, (replaceTask index newTask tasks))
+--modyfikacja opisu
+modDesc ((Task id when repeatable name description isDone), tasks) = do
     maybeDescription <- getName description "Describe task"
+    let oldTask = Task id when repeatable name description isDone
     if  ( isNothing maybeDescription )
-          then do putStrLn "Wrong Description value"
+          then do
+                putStrLn "Wrong description value!"
+                putStrLn ("\n")
+                return (oldTask, tasks)
+          else do
+                putStrLn "Task changed successfully!"
+                putStrLn ("\n")
+                let index = fromJust (elemIndex oldTask tasks) in
+                        let newTask = (Task id when repeatable name (fromJust maybeDescription) isDone) in
+                                return (oldTask, (replaceTask index newTask tasks))
 
--}
+--propozycja funkcji updatujaca repetujace rzeczy :---D
+--updateRepeatable ((Task id when repeatable name description isDone), tasks) = do
+
+
 
