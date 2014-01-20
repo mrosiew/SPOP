@@ -91,6 +91,8 @@ viewAllTasks (World tasks day) = do
     printTaskList tasks
     return (World tasks day)
 
+viewUpdatedTasksToDoToday::World->IO World
+viewUpdatedTasksToDoToday world = viewTasksToDoToday (updateEverything world)
 
 viewTasksToDoToday::World-> IO World
 viewTasksToDoToday (World tasks day) = do
@@ -102,8 +104,8 @@ viewTasksToDoToday (World tasks day) = do
                       else do printTaskList taskList
                               return (World tasks day)
 
---viewUpdatedTasksToDoOnX::World->IO World
---viewUpdatedTasksToDoOnX world =  viewTasksToDoOnX (updateEverything world)
+viewUpdatedTasksToDoOnX::World->IO World
+viewUpdatedTasksToDoOnX world =  viewTasksToDoOnX (updateEverything world)
 
 viewTasksToDoOnX::World-> IO World
 viewTasksToDoOnX (World tasks day) = do
@@ -335,8 +337,10 @@ modDesc ((Task id when repeatable name description isDone), tasks) = do
                         let newTask = (Task id when repeatable name (fromJust maybeDescription) isDone) in
                                 return (oldTask, (replaceTask index newTask tasks))
 
-updateEverything (World tasks day) =
+updateEverythingMenu (World tasks day) =
         return (World (doUpdateEverything(World tasks day) (getNextTaskId tasks)) day)
+
+updateEverything (World tasks day) = World (doUpdateEverything(World tasks day) (getNextTaskId tasks)) day
 
 doUpdateEverything (World [] day) _ = []
 doUpdateEverything (World (taskHead:restOfList) day) givenId =

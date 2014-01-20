@@ -27,13 +27,13 @@ mainMenu world = do
                 putStrLn ("Hi! Today is " ++  (show (todaysDate world )))
                 pickedTask <- menu [("Print all tasks", viewAllTasks),
                                     ("Print unfinished tasks", viewUnfinishedTasks),
-                                    ("Print tasks to do today",viewTasksToDoToday),
-                                    ("Print task for particular day",viewTasksToDoOnX),
+                                    ("Print tasks to do today",viewUpdatedTasksToDoToday),
+                                    ("Print task for particular day",viewUpdatedTasksToDoOnX),
                                     ("Manage tasks",manageTaskMenu),
                                     ("Export tasks to file",empty), ---------------
                                     ("Import tasks from file",empty), ---------------
                                     ("Change a date (debug)",changeDate),
-                                    ("Update everything", updateEverything),
+--                                   ("Update everything", updateEverythingMenu),
                                     ("Exit program", exit)]
                 updatedWorld <- pickedTask world
                 mainMenu updatedWorld
