@@ -20,6 +20,7 @@ import Numeric
 import Text.Regex.Posix
 import Data.Maybe
 import Task
+import Control.Exception
 
 printNewLine = putStrLn ""
 printSeparator = print "---"
@@ -126,3 +127,12 @@ replaceTask index newTask (x:xs)  | index == 0   = newTask : xs
      
 --let maybeWhen = checkWhen (fromJust maybeWhenfiled)
 
+
+exportToFile :: (Show a) => a -> FilePath -> IO ()
+exportToFile expWorld filePath = writeFile filePath (show expWorld)
+
+
+importFromFile :: FilePath -> (String -> b) -> IO b
+importFromFile filePath impWorld = do
+        raw <- catch (readFile filePath)
+        return (impWorld (strip raw))

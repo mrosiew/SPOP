@@ -30,15 +30,13 @@ mainMenu world = do
                                     ("Print tasks to do today",viewUpdatedTasksToDoToday),
                                     ("Print task for particular day",viewUpdatedTasksToDoOnX),
                                     ("Manage tasks",manageTaskMenu),
-                                    ("Export tasks to file",empty), ---------------
-                                    ("Import tasks from file",empty), ---------------
+                                    ("Export tasks to file",exportData),
+                                    ("Import tasks from file",importData),
                                     ("Change a date (debug)",changeDate),
---                                   ("Update everything", updateEverythingMenu),
                                     ("Exit program", exit)]
                 updatedWorld <- pickedTask world
                 mainMenu updatedWorld
-        --mozna zrobic to inaczej ( w sensie bez importowania
-        --System.Exit, ale jak tak jest to chyba tez dobrze )
+
 
 manageTaskMenu::World -> IO World
 manageTaskMenu world = do

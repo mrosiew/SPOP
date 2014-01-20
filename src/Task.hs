@@ -39,7 +39,7 @@ newWorld = (World [] (unsafePerformIO getSystemDay)) --yolo
 data World = World {
     tasks::[Task],
     currentDay::Day --do implementacji jako dzien
-    }
+    } deriving (Show, Read)
 
 data Task = Task {
     id::Int,

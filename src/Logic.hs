@@ -312,7 +312,7 @@ modName ((Task id when repeatable name description isDone), tasks) = do
     let oldTask = Task id when repeatable name description isDone
     if  ( isNothing maybeName )
           then do
-                putStrLn "Wrong name value!"
+                putStrLn "No name value!"
                 putStrLn ("\n")
                 return (oldTask, tasks)
           else do
@@ -327,7 +327,7 @@ modDesc ((Task id when repeatable name description isDone), tasks) = do
     let oldTask = Task id when repeatable name description isDone
     if  ( isNothing maybeDescription )
           then do
-                putStrLn "Wrong description value!"
+                putStrLn "No description value!"
                 putStrLn ("\n")
                 return (oldTask, tasks)
           else do
@@ -348,7 +348,7 @@ doUpdateEverything (World (taskHead:restOfList) day) givenId =
         updatedList ++ (doUpdateEverything (World restOfList day) (getNextTaskId updatedList))
 
 
---propozycja funkcji updatujaca repetujace rzeczy :---D
+
 --modyfikujemy zadanie ustawiajac mu repeatable na 'no'
 updateRepeatable (Task id when repeatable name description isDone) day maxId =
         let oldTask = Task id when repeatable name description isDone in
@@ -375,3 +375,44 @@ getNewDay repeatable day        | repeatable == 1  = addDays 1 day
                                 | repeatable == 2  = addDays 7 day
                                 | repeatable == 3  = addGregorianMonthsRollOver 1 day
                                 | repeatable == 4  = addGregorianYearsRollOver 1 day
+
+
+exportData world = do
+  filePath <- getName name "Where do you want to save the file?"
+  if  ( isNothing filePath )
+          then do
+                putStrLn "No file path!"
+                putStrLn ("\n")
+                return world
+          else do
+                exportToFile world (fromJust filePath)
+                putStrLn "File saved"
+                return world
+                                 
+
+
+importData world = do --doLoadData world
+--  where
+--    doLoadData addressBook = do
+      filePath <- getName name "What file do you want to load?"
+      if isNothing filePath
+          then do
+                putStrLn "No file path!"
+                putStrLn ("\n")
+                return world
+          else do
+                maybeWorld <- importFromFile (fromJust filePath) readmaybeWorld
+                if isNothing maybeWorld
+                    then do
+                      putStrLn "Error: file not found!"
+                      putStrLn ("\n")
+                      return world
+                    else do
+                      putStrLn "File loaded successfully!"
+                      let newWorld = fromJust maybeWorld
+                      return newWorld
+                           where
+                               readmaybeWorld :: String -> Maybe World
+                               readmaybeWorld = readMaybe
+
+
