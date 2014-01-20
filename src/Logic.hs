@@ -102,11 +102,13 @@ viewTasksToDoToday (World tasks day) = do
                       else do printTaskList taskList
                               return (World tasks day)
 
+--viewUpdatedTasksToDoOnX::World->IO World
+--viewUpdatedTasksToDoOnX world =  viewTasksToDoOnX (updateEverything world)
 
 viewTasksToDoOnX::World-> IO World
 viewTasksToDoOnX (World tasks day) = do
     maybeDayfield <- getName when "What date do you want to check? (yyyy-mm-dd)"
-
+    
     let maybeDay = getDateWithValidation (fromJust maybeDayfield)
 
     if  ( isNothing maybeDay )
@@ -333,8 +335,39 @@ modDesc ((Task id when repeatable name description isDone), tasks) = do
                         let newTask = (Task id when repeatable name (fromJust maybeDescription) isDone) in
                                 return (oldTask, (replaceTask index newTask tasks))
 
+updateEverything (World tasks day) =
+        return (World (doUpdateEverything(World tasks day) (getNextTaskId tasks)) day)
+
+doUpdateEverything (World [] day) _ = []
+doUpdateEverything (World (taskHead:restOfList) day) givenId =
+        let updatedList = (updateRepeatable taskHead day givenId) in --fiz w przypadku gdy nie ma nowych id
+        updatedList ++ (doUpdateEverything (World restOfList day) (getNextTaskId updatedList))
+
+
 --propozycja funkcji updatujaca repetujace rzeczy :---D
---updateRepeatable ((Task id when repeatable name description isDone), tasks) = do
+--modyfikujemy zadanie ustawiajac mu repeatable na 'no'
+updateRepeatable (Task id when repeatable name description isDone) day maxId =
+        let oldTask = Task id when repeatable name description isDone in
+        if repeatable == 0 || when > day
+                then [oldTask]
+                else
+                        let oldUpdatedTask = (Task id when 0 name description isDone) in
+                        let newTaskPattern = (Task maxId when repeatable name description False) in
+                            oldUpdatedTask:(addRepeatables newTaskPattern day)
 
 
 
+addRepeatables (Task givenId when repeatable name description isDone) day  =
+        let newDay = getNewDay repeatable when in
+        if (newDay <= day) then
+                let furtherList = (addRepeatables (Task (givenId+1) newDay repeatable name description False) day) in
+                let newTask = (Task givenId newDay 0 name description False) in
+                        newTask : furtherList
+            else
+                let newTask = (Task givenId newDay repeatable name description False) in
+                        [newTask]
+
+getNewDay repeatable day        | repeatable == 1  = addDays 1 day
+                                | repeatable == 2  = addDays 7 day
+                                | repeatable == 3  = addGregorianMonthsRollOver 1 day
+                                | repeatable == 4  = addGregorianYearsRollOver 1 day

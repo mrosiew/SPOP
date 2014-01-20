@@ -33,6 +33,7 @@ mainMenu world = do
                                     ("Export tasks to file",empty), ---------------
                                     ("Import tasks from file",empty), ---------------
                                     ("Change a date (debug)",changeDate),
+                                    ("Update everything", updateEverything),
                                     ("Exit program", exit)]
                 updatedWorld <- pickedTask world
                 mainMenu updatedWorld
