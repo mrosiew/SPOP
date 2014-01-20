@@ -14,16 +14,15 @@
 
 module Menus (mainMenu) where
 
---import System.Console.ANSI
 import Interface
 import System.Exit
 import Logic
 import Task
 import Data.Time.Calendar
 
+--Program's main loop
 mainMenu::World -> IO World
 mainMenu world = do
-      --  temp <- toGregorian day
                 putStrLn ("Hi! Today is " ++  (show (todaysDate world )))
                 pickedTask <- menu [("Print all tasks", viewAllTasks),
                                     ("Print unfinished tasks", viewUnfinishedTasks),
@@ -37,7 +36,7 @@ mainMenu world = do
                 updatedWorld <- pickedTask world
                 mainMenu updatedWorld
 
-
+--Defines manage task submenu
 manageTaskMenu::World -> IO World
 manageTaskMenu world = do
         pickedTask <- menu [("Add task", addTask),
@@ -49,12 +48,10 @@ manageTaskMenu world = do
         return kek
 
 
---filler
+--Filler function
 empty::World -> IO World
 empty world = do
             return world
 
-            
-
-
+--Exits program            
 exit _ = exitWith ExitSuccess

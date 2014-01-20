@@ -21,6 +21,7 @@ module Main (
 import Menus
 import Task
 
+--Executes mainMenu function
 main = do
         mainMenu newWorld
 

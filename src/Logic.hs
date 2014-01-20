@@ -14,7 +14,6 @@
 
 module Logic where
 
---import System.Console.ANSI
 import Data.List
 import Data.Maybe
 import Task
@@ -23,16 +22,20 @@ import Task
 import Interface
 import Data.Time.Calendar
 
+--Gets data needed to create a new task
 addTask::World -> IO World
 addTask (World tasks day) = do
     maybeWhenfield <- getName when "When is this task due? (yyyy-mm-dd)"
+    --maybeHourfield <- getName hour "placeholder"
     maybeRepeatablefield <- getName repeatable "Is this task repeatable? ('no, 'daily, 'weekly' or 'monthly', 'yearly')"
     maybeName <- getName name "Name of the task"
     maybeDescription <- getName description "Describe task"
 
     let maybeWhen = getDateWithValidation (fromJust maybeWhenfield)
     let maybeRepeatable = getRepeValidation (fromJust maybeRepeatablefield)
-
+    --let maybeHour = words (fromJust maybeHourfield)
+    --let newHour = parseHour maybeHour 2
+    
     if  ( isNothing maybeWhen )
           then do
               putStrLn "Wrong date format! Please use yyyy-mm-dd instead"
@@ -60,15 +63,14 @@ addTask (World tasks day) = do
            putStrLn "Error when adding a task"
            putStrLn ("\n")
            return (World tasks day)
-        else do
+        else do        
             let newTaskList = doAddTask   ( getNextTaskId tasks)
                                       (fromJust maybeWhen)
                                        maybeRepeatable
                                       ( fromJust maybeName)
                                       ( fromJust maybeDescription)
                                       False
-                                      tasks
-                                      
+                                      tasks                                      
             putStrLn ("\n")
             putStrLn ("Task added successfully!")
             putStrLn ("\n")
@@ -76,24 +78,27 @@ addTask (World tasks day) = do
             
             return (World newTaskList day)
 
+--Adds new task to tasks list
 doAddTask::Int->Day->Int->String->String->Bool->[Task]->[Task]
 doAddTask id when repeatable name description isDone tasks = do
         [(Task id when repeatable name description isDone)] ++ tasks -- [] ??
 
-        
+--Gets first free id        
 getNextTaskId:: [Task] -> Int
 getNextTaskId [] = 1;
 getNextTaskId (x:xs) = (max (getTaskId x) (getNextTaskId xs))+1 ;
 
-
+--Views all tasks from tasks list
 viewAllTasks::World-> IO World
 viewAllTasks (World tasks day) = do
     printTaskList tasks
     return (World tasks day)
 
+--Views task with today as it's due date
 viewUpdatedTasksToDoToday::World->IO World
 viewUpdatedTasksToDoToday world = viewTasksToDoToday (updateEverything world)
 
+--Helper fucntion used to display tasks
 viewTasksToDoToday::World-> IO World
 viewTasksToDoToday (World tasks day) = do
     let taskList = filterTasksOnDate tasks day day
@@ -104,9 +109,11 @@ viewTasksToDoToday (World tasks day) = do
                       else do printTaskList taskList
                               return (World tasks day)
 
+--Views tasks with specific due date
 viewUpdatedTasksToDoOnX::World->IO World
-viewUpdatedTasksToDoOnX world =  viewTasksToDoOnX (updateEverything world)
+viewUpdatedTasksToDoOnX world = viewTasksToDoOnX (updateEverything world)
 
+--Helper fucntion used to display tasks
 viewTasksToDoOnX::World-> IO World
 viewTasksToDoOnX (World tasks day) = do
     maybeDayfield <- getName when "What date do you want to check? (yyyy-mm-dd)"
@@ -127,13 +134,13 @@ viewTasksToDoOnX (World tasks day) = do
                                 else do printTaskList taskList
                                         return (World tasks day)
 
-
+--Views Unfinished tasks
 viewUnfinishedTasks::World-> IO World
 viewUnfinishedTasks (World tasks day) = do
     printTaskList (filterFinishedTasks tasks False)
     return (World tasks day)
 
-
+--Prints tasks
 printTaskList (firstTaskInList:restOfTasks) = do
     printTask firstTaskInList
     printTaskList restOfTasks
@@ -141,7 +148,7 @@ printTaskList (firstTaskInList:restOfTasks) = do
 printTaskList [] = do
     return 0
 
-
+--Returns a list of task with specific due date
 filterTasksOnDate (firstTaskInList:restOfTasks) after before =
         let dayOfTheTask = getTaskWhen firstTaskInList in
                 if dayOfTheTask > after ||
@@ -150,7 +157,7 @@ filterTasksOnDate (firstTaskInList:restOfTasks) after before =
                         else firstTaskInList : (filterTasksOnDate restOfTasks after before)
 filterTasksOnDate [] _ _ = []
 
-
+--Returns a list of finished tasks
 filterFinishedTasks::[Task] -> Bool-> [Task]
 filterFinishedTasks (firstTaskInList:restOfTasks) isDone =
     if getTaskIsDone firstTaskInList == isDone
@@ -158,7 +165,7 @@ filterFinishedTasks (firstTaskInList:restOfTasks) isDone =
         else filterFinishedTasks restOfTasks isDone
 filterFinishedTasks [] _ = []
 
-
+--Function used to remove a task from tasks list
 removeTask::World-> IO World
 removeTask (World tasks day) = do
     putStrLn "Which task do you want to delete?"
@@ -179,7 +186,7 @@ removeTask (World tasks day) = do
                     putStrLn ("\n")
                     return (World lessTasks day)
 
-
+--Function used to mark tasks as done
 markAsDone::World-> IO World
 markAsDone (World tasks day) = do
     putStrLn "Which task do you want to mark as done?"
@@ -208,7 +215,7 @@ markAsDone (World tasks day) = do
                     putStrLn ("\n")
                     return (World changedTasks day)
 
-
+--Function used to change current date
 changeDate (World tasks day) = do
     maybeDayfield <- getName when "What date do you want to set? (yyyy-mm-dd)"
 
@@ -224,9 +231,10 @@ changeDate (World tasks day) = do
               putStrLn ("\n")
               return (World tasks (fromJust maybeDay))
 
-
+--Frunction returns current date
 todaysDate (World tasks day) = day
 
+--Function used to change task data
 modifyTask::World->IO World
 modifyTask (World tasks day) = do
     putStrLn "Which task do you want to modify?"
@@ -247,20 +255,18 @@ modifyTask (World tasks day) = do
                     let newTaskList = modifyTaskMenu task tasks
                     putStrLn "Task status changed successfully!"
                     putStrLn ("\n")
-                    --tutaj zamieniam IO (Task,[Task]) na IO [Task] tak jak powinno byc
-                    --dzieje sie to ze z jakiegos powodu funkcje w menu musza zwracac dokladnie to
-                    --samo co przyjmuja co jest dosc slabe ale nie da sie tego tak latwo obejsc
                     newTaskList >>= (\ x -> liftWorld (return (snd x)) (return day))
-                    --liftWorld asd (return day)
 
 --liftWorld :: Monad m => (a -> b -> c) -> m a -> m b -> m c
 --liftWorld::IO m => IO [Task] -> IO Day -> IO World
+--helper fucntion creating new world
 liftWorld  changedTasks day = do
         x <- changedTasks
         y <- day
         return (World x y)
 
 --modifyTaskMenu::Task->[Task]->IO [Task]
+--Defines modify task menu
 modifyTaskMenu task taskList = do
         pickedTask <- menu [("Modify task's due date", modDate),
                             ("Modify how often the task will be repeated", modRepe), --modRepe),
@@ -270,10 +276,11 @@ modifyTaskMenu task taskList = do
         kek <- pickedTask (task, taskList) --
         return kek
 
+--Filler function
 emp (task, taskList) = do return (task, taskList)
 
 --modDate::Task->[Task]->IO [Task]
---modyfikacja powtarzania daty
+--Modifies task's due date
 modDate ((Task id when repeatable name description isDone), tasks) = do
     maybeWhenfield <- getName when "When is this task due? (yyyy-mm-dd)"
     let maybeWhen = getDateWithValidation (fromJust maybeWhenfield)
@@ -289,7 +296,7 @@ modDate ((Task id when repeatable name description isDone), tasks) = do
                 let index = fromJust (elemIndex oldTask tasks) in
                         let newTask = (Task id (fromJust maybeWhen) repeatable name description isDone) in
                                 return (oldTask, (replaceTask index newTask tasks))
---modyfikacja powtarzalnosci
+--Modifies task's repeatability
 modRepe ((Task id when repeatable name description isDone), tasks) = do
     maybeRepeatablefield <- getName repeatable "Is this task repeatable? ('no, 'daily, 'weekly', 'monthly' or 'yearly')"
     let maybeRepeatable = getRepeValidation (fromJust maybeRepeatablefield)
@@ -306,7 +313,7 @@ modRepe ((Task id when repeatable name description isDone), tasks) = do
                         let newTask = (Task id when maybeRepeatable name description isDone) in
                                 return (oldTask, (replaceTask index newTask tasks))
 
---modyfikacja nazwy
+--Modifies task's name
 modName ((Task id when repeatable name description isDone), tasks) = do
     maybeName <- getName name "Name of the task"
     let oldTask = Task id when repeatable name description isDone
@@ -321,7 +328,7 @@ modName ((Task id when repeatable name description isDone), tasks) = do
                 let index = fromJust (elemIndex oldTask tasks) in
                         let newTask = (Task id when repeatable (fromJust maybeName) description isDone) in
                                 return (oldTask, (replaceTask index newTask tasks))
---modyfikacja opisu
+--Modifies task's description
 modDesc ((Task id when repeatable name description isDone), tasks) = do
     maybeDescription <- getName description "Describe task"
     let oldTask = Task id when repeatable name description isDone
@@ -337,19 +344,21 @@ modDesc ((Task id when repeatable name description isDone), tasks) = do
                         let newTask = (Task id when repeatable name (fromJust maybeDescription) isDone) in
                                 return (oldTask, (replaceTask index newTask tasks))
 
+--Function used for making copies of repeatable task (permanent)
 updateEverythingMenu (World tasks day) =
         return (World (doUpdateEverything(World tasks day) (getNextTaskId tasks)) day)
 
+--Helper function used for making copies of repeatable task
 updateEverything (World tasks day) = World (doUpdateEverything(World tasks day) (getNextTaskId tasks)) day
 
+--Function used for making copies of repeatable task 
 doUpdateEverything (World [] day) _ = []
 doUpdateEverything (World (taskHead:restOfList) day) givenId =
-        let updatedList = (updateRepeatable taskHead day givenId) in --fiz w przypadku gdy nie ma nowych id
+        let updatedList = (updateRepeatable taskHead day givenId) in
         updatedList ++ (doUpdateEverything (World restOfList day) (getNextTaskId updatedList))
 
 
-
---modyfikujemy zadanie ustawiajac mu repeatable na 'no'
+--Changes task's repeatability to 'no'
 updateRepeatable (Task id when repeatable name description isDone) day maxId =
         let oldTask = Task id when repeatable name description isDone in
         if repeatable == 0 || when > day
@@ -359,8 +368,7 @@ updateRepeatable (Task id when repeatable name description isDone) day maxId =
                         let newTaskPattern = (Task maxId when repeatable name description False) in
                             oldUpdatedTask:(addRepeatables newTaskPattern day)
 
-
-
+--Adds repeatable task copies
 addRepeatables (Task givenId when repeatable name description isDone) day  =
         let newDay = getNewDay repeatable when in
         if (newDay <= day) then
@@ -370,13 +378,14 @@ addRepeatables (Task givenId when repeatable name description isDone) day  =
             else
                 let newTask = (Task givenId newDay repeatable name description False) in
                         [newTask]
-
+                        
+--Helper function getting new days for repeatable tasks
 getNewDay repeatable day        | repeatable == 1  = addDays 1 day
                                 | repeatable == 2  = addDays 7 day
                                 | repeatable == 3  = addGregorianMonthsRollOver 1 day
                                 | repeatable == 4  = addGregorianYearsRollOver 1 day
 
-
+--Function for exporting data
 exportData world = do
   filePath <- getName name "Where do you want to save the file?"
   if  ( isNothing filePath )
@@ -390,10 +399,8 @@ exportData world = do
                 return world
                                  
 
-
-importData world = do --doLoadData world
---  where
---    doLoadData addressBook = do
+--Function for importing data
+importData world = do
       filePath <- getName name "What file do you want to load?"
       if isNothing filePath
           then do

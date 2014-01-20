@@ -1,7 +1,7 @@
 -----------------------------------------------------------------------------
 --
 -- Module      :  Task
--- Copyright   :
+-- Copyright   :  Mateusz Rosiewicz i Pawel Sosnowski
 -- License     :  AllRightsReserved
 --
 -- Maintainer  :
@@ -21,9 +21,7 @@ import Numeric
 import Data.Time.Calendar
 import System.IO.Unsafe --35th line
 
---import Time
---import System.Locale (defaultTimeLocale)
-
+--Gets current day
 getSystemDay::IO Day
 getSystemDay = do
         currentTime <- getCurrentTime
@@ -31,25 +29,28 @@ getSystemDay = do
                 let (y,m,d) = toGregorian currentUtcDay in
                         let gregorianDay = fromGregorian y m d in
                                 return gregorianDay
-       
+
+--Creates new World that cointains other data       
 newWorld::World
-newWorld = (World [] (unsafePerformIO getSystemDay)) --yolo
+newWorld = (World [] (unsafePerformIO getSystemDay))
 
-
+--Structure containing task list and current day
 data World = World {
     tasks::[Task],
-    currentDay::Day --do implementacji jako dzien
+    currentDay::Day
     } deriving (Show, Read)
 
+--Structure conteining task-related data
 data Task = Task {
     id::Int,
-    when::Day, --do implementacji jako dzien
-    repeatable::Int, --powinien byc jakis smieszny enum
+    when::Day,
+    repeatable::Int,
     name::String,
     description::String,
     isDone::Bool
 } deriving (Show, Read, Eq)
 
+--Gets data form a field
 getTaskId(Task id _ _ _ _ _) = id
 getTaskWhen(Task _ when _ _ _ _) = when
 getTaskRepeatable(Task _ _ repeatable _ _ _) = repeatable
